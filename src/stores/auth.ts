@@ -50,7 +50,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function trySignIn() {
     const { data, error } = await supabase.auth.getSession();
 
-    if (error) return false;
+    if (error) return { status: 'error', reason: 'no session' };
+
+    if (data.session && !data.session.user.email_confirmed_at) {
+      return { status: 'email', reason: 'email verification error' };
+    }
 
     if (data.session && data.session.user.email_confirmed_at) {
       isAuthenticated.value = true;
@@ -58,10 +62,10 @@ export const useAuthStore = defineStore('auth', () => {
 
       await setUsername();
 
-      return true;
+      return { status: 'succsess' };
     }
 
-    return false;
+    return { status: 'error' };
   }
 
   async function signOut() {

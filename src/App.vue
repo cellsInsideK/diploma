@@ -22,7 +22,7 @@
   onMounted(async () => {
     const res = await auth.trySignIn();
 
-    if (!res) {
+    if (res.status === 'email') {
       return toast.error('Возможно, вы не подтвердили почту.')
     }
   })
