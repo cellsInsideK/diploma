@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { ref, watch } from 'vue';
+  import { useRoute, useRouter } from 'vue-router';
   import { toast } from 'vue-sonner';
 
   import { useAuthStore } from '@/stores/auth';
@@ -10,6 +10,13 @@
 
   const auth = useAuthStore();
   const router = useRouter();
+  const route = useRoute();
+
+  watch(() => auth.isAuthenticated, () => {
+    if (route.query.redirect) {
+      router.push(`${route.query.redirect}`)
+    }
+  })
 
   const onSubmit = async () => {
     if (email.value === '' || password.value === '')
@@ -18,7 +25,7 @@
     const success = await auth.signIn(email.value, password.value);
 
     if (!success)
-      return toast.error('Что-то пошло не так. Попробуйте позже')
+      return toast.error('Возможно, вы не подтвердили почту')
 
     toast.success('Вход завершен');
     return router.push('/');

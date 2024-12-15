@@ -58,14 +58,14 @@
         <div class="list">
           <template v-for="option in milkTypeList" :key="option.value">
             <label><input type="radio" :id="option.value" :value="option.value" v-model="milkType" />
-              {{ option.label }}</label>
+              {{ option.label }} ({{ option.price }} ₽)</label>
           </template>
         </div>
         <h3>Добавки:</h3>
         <div class="list">
           <template v-for="option in toppingTypeList" :key="option.value">
             <label><input type="radio" :id="option.value" :value="option.value" v-model="toppingType" />
-              {{ option.label }}</label>
+              {{ option.label }} ({{ option.price }} ₽)</label>
           </template>
         </div>
       </div>

@@ -3,11 +3,13 @@
 
   import UiMenuItem from '@/components/UiMenuItem.vue';
   import { supabase } from '@/lib/supabaseClient';
+  import UiLoader from '@/components/UiLoader.vue';
 
   const sortType = ref<null | 'coffee' | 'drinks' | 'desserts' | 'bakery'>(null);
   const search = ref('');
 
   const items = ref();
+  const loading = ref(true);
 
   const sortedItems = computed(() => {
     if (search.value !== '' && sortType.value !== null) {
@@ -35,25 +37,15 @@
   onMounted(async () => {
     const { data } = await supabase.from('menu').select();
     items.value = data;
+    loading.value = false;
   })
 </script>
 
 <template>
-  <div class="container">
-    <div class="inner">
-      <aside class="categories">
-        <h2>Категории</h2>
-        <ul>
-          <li @click="sortType = null" :class="{ 'active': sortType === null }">Все товары</li>
-          <li @click="sortType = 'coffee'" :class="{ 'active': sortType === 'coffee' }">Кофе</li>
-          <li @click="sortType = 'drinks'" :class="{ 'active': sortType === 'drinks' }">Холодные напитки</li>
-          <li @click="sortType = 'desserts'" :class="{ 'active': sortType === 'desserts' }">Десерты</li>
-          <li @click="sortType = 'bakery'" :class="{ 'active': sortType === 'bakery' }">Выпечка</li>
-        </ul>
-      </aside>
-      <div class="main">
-        <input class="input" type="text" v-model="search" placeholder="Поиск">
-        <aside class="categories adaptive">
+  <UiLoader :is-loading="loading">
+    <div class="container">
+      <div class="inner">
+        <aside class="categories">
           <h2>Категории</h2>
           <ul>
             <li @click="sortType = null" :class="{ 'active': sortType === null }">Все товары</li>
@@ -63,14 +55,28 @@
             <li @click="sortType = 'bakery'" :class="{ 'active': sortType === 'bakery' }">Выпечка</li>
           </ul>
         </aside>
-        <div class="items">
-          <template v-for="item in sortedItems" :key="item.id">
-            <UiMenuItem :item="item" />
-          </template>
+        <div class="main">
+          <input class="input" type="text" v-model="search" placeholder="Поиск">
+          <aside class="categories adaptive">
+            <h2>Категории</h2>
+            <ul>
+              <li @click="sortType = null" :class="{ 'active': sortType === null }">Все товары</li>
+              <li @click="sortType = 'coffee'" :class="{ 'active': sortType === 'coffee' }">Кофе</li>
+              <li @click="sortType = 'drinks'" :class="{ 'active': sortType === 'drinks' }">Холодные напитки</li>
+              <li @click="sortType = 'desserts'" :class="{ 'active': sortType === 'desserts' }">Десерты</li>
+              <li @click="sortType = 'bakery'" :class="{ 'active': sortType === 'bakery' }">Выпечка</li>
+            </ul>
+          </aside>
+          <div class="items">
+            <template v-for="item in sortedItems" :key="item.id">
+              <UiMenuItem :item="item" />
+            </template>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </UiLoader>
+
 </template>
 
 <style scoped>

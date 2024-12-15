@@ -6,8 +6,10 @@
   import { supabase } from '@/lib/supabaseClient';
   import { useAuthStore } from '@/stores/auth';
   import type { DeliveryItem } from '@/stores/cartItem';
+  import UiLoader from '@/components/UiLoader.vue';
 
-  const deliveries = ref<DeliveryItem[]>();
+  const deliveries = ref<DeliveryItem[]>([]);
+  const loading = ref(true);
   const sortType = ref<'asc' | 'desc'>('desc');
 
   const auth = useAuthStore();
@@ -33,6 +35,7 @@
       return toast.error('Произошла ошибка');
     }
 
+    loading.value = false;
     deliveries.value = data;
   })
 
@@ -43,24 +46,29 @@
 </script>
 
 <template>
-  <div class="container">
-    <header class="header">
-      <img :src="`https://ui-avatars.com/api/?name=${auth.username}&rounded=true&size=175`" class="avatar"
-        alt="user avatar">
-      <h2 class="username">{{ auth.username }}</h2>
-    </header>
-    <section>
-      <div class="top">
-        <h2 class="title">Мои заказы</h2>
-        <img @click="handleSort" src="/sort.svg" alt="sort deliveries by datetime">
-      </div>
-      <div class="cards">
-        <template v-for="item in sortedDeliveries" :key="item.id">
-          <UiDeliveryItem :delivery="item" />
-        </template>
-      </div>
-    </section>
-  </div>
+  <UiLoader :is-loading="loading">
+    <div class="container">
+      <header class="header">
+        <img :src="`https://ui-avatars.com/api/?name=${auth.username}&rounded=true&size=175`" class="avatar"
+          alt="user avatar">
+        <h2 class="username">{{ auth.username }}</h2>
+      </header>
+      <section>
+        <div class="top">
+          <h2 class="title">Мои заказы</h2>
+          <img v-if="sortedDeliveries?.length > 0" @click="handleSort" src="/sort.svg"
+            alt="sort deliveries by datetime">
+        </div>
+        <div v-if="sortedDeliveries.length > 0" class="cards">
+          <template v-for="item in sortedDeliveries" :key="item.id">
+            <UiDeliveryItem :delivery="item" />
+          </template>
+        </div>
+        <div v-else class="empty">Похоже, здесь пусто. 😢<br> Оформите доставку, чтобы увидеть свои заказы</div>
+      </section>
+    </div>
+  </UiLoader>
+
 </template>
 
 <style scoped>
@@ -106,6 +114,15 @@
     margin-block: 10px;
   }
 
+  .empty {
+    display: grid;
+    place-items: center;
+    height: 300px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
+  }
+
   @media (max-width: 1000px) {
     .header {
       margin-block: 15px;
@@ -114,7 +131,5 @@
     .avatar {
       width: 100px
     }
-
-
   }
 </style>

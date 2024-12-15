@@ -5,6 +5,7 @@
   import { supabase } from '@/lib/supabaseClient';
   import type { DeliveryItem, LocalCartItem } from '@/stores/cartItem';
   import { useCartStore } from '@/stores/cart';
+  import router from '@/router';
 
 
   const { delivery } = defineProps<{
@@ -79,7 +80,9 @@
       return toast.error('Попробуйте позже')
     }
 
-    return toast.success('Заказ отменен')
+    toast.success('Заказ отменен')
+
+    return router.go(0);
   }
 
   const handleRepeat = async () => {
@@ -98,11 +101,16 @@
     <div class="top">
       <div class="info">
         <p class="number">Заказ #{{ delivery.id.slice(0, 6) }}</p>
-        <p class="date">От {{ new Date(delivery.date).toLocaleDateString('ru') }}</p>
+        <p class="date">От {{ new Date(delivery.date).toLocaleString('ru', {
+          dateStyle: 'short', timeStyle: 'short'
+        }) }}</p>
         <p class="status">{{ statusMap.get(delivery.status) }}</p>
       </div>
       <img @click="handleRepeat" class="repeat" src="/repeat.svg" alt="repeat delivery">
     </div>
+    <p class="mobileDate"> От {{ new Date(delivery.date).toLocaleString('ru', {
+      dateStyle: 'short', timeStyle: 'short'
+    }) }}</p>
     <div class="main">
       <template v-for="item in items" :key="item.localId">
         <div class="main-inner">
@@ -212,6 +220,13 @@
     color: rgba(255, 234, 234, 0.5)
   }
 
+  .mobileDate {
+    display: none;
+    font-weight: 700;
+    color: rgba(255, 234, 234, 0.5);
+    margin-block: -20px;
+  }
+
   .status {
     font-weight: 700;
   }
@@ -233,6 +248,10 @@
 
     .date {
       display: none;
+    }
+
+    .mobileDate {
+      display: block;
     }
 
     .status {

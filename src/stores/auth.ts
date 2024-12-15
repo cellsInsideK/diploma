@@ -24,10 +24,12 @@ export const useAuthStore = defineStore('auth', () => {
       return false;
     }
 
-    user.value = data.user;
-    isAuthenticated.value = true;
+    if (user.value?.email_confirmed_at) {
+      user.value = data.user;
+      isAuthenticated.value = true;
 
-    await setUsername();
+      await setUsername();
+    }
 
     return true;
   }
@@ -48,14 +50,18 @@ export const useAuthStore = defineStore('auth', () => {
   async function trySignIn() {
     const { data, error } = await supabase.auth.getSession();
 
-    if (error) return;
+    if (error) return false;
 
-    if (data.session) {
+    if (data.session && data.session.user.email_confirmed_at) {
       isAuthenticated.value = true;
       user.value = data.session?.user;
 
       await setUsername();
+
+      return true;
     }
+
+    return false;
   }
 
   async function signOut() {

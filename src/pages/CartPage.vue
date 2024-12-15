@@ -24,7 +24,7 @@
       <button v-if="!cart.isEmpty" @click="cart.clearCart" class="header-btn" type="button"><img src="/delete.svg"
           alt=""></button>
     </header>
-    <div class="cart">
+    <div v-if="!cart.isEmpty" class="cart">
       <div class="items">
         <template v-for="item in cart.items" :key="item.id">
           <UiCartItem :item="item" />
@@ -39,6 +39,7 @@
         <button @click="handleSumbit" class="submit">К оформлению</button>
       </div>
     </div>
+    <div v-else class="empty">Похоже, здесь пусто. 😢<br>Добавьте товары в корзину для оформления доставки</div>
   </div>
 </template>
 
@@ -113,6 +114,15 @@
     font-weight: bold;
     cursor: pointer;
     margin-top: 20px;
+  }
+
+  .empty {
+    display: grid;
+    place-items: center;
+    height: 300px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 20px;
   }
 
   @media (max-width: 1000px) {

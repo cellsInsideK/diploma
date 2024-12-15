@@ -6,8 +6,10 @@
   import { supabase } from '@/lib/supabaseClient';
   import { useCartStore } from '@/stores/cart';
   import type { CartItem } from '@/stores/cartItem';
+  import UiLoader from '@/components/UiLoader.vue';
 
   const item = ref<CartItem>();
+  const loading = ref(true);
   const selectedMilk = ref('default');
   const selectedTopping = ref('default');
   const route = useRoute();
@@ -21,6 +23,7 @@
       return toast.error('Попробуйте позже');
     }
 
+    loading.value = false;
     item.value = data![0];
   })
 
@@ -43,44 +46,51 @@
   })
 
   const handleClick = () => {
-    cart.addToCart(item.value!, selectedMilk.value, selectedTopping.value);
+    const res = cart.addToCart(item.value!, selectedMilk.value, selectedTopping.value);
+
+    if (!res) {
+      return toast.error('Необходимо войти в аккаунт')
+    }
+
     toast.success('Товар добавлен в корзину')
     return router.push('/cart');
   }
 </script>
 
 <template>
-  <div class="container">
-    <div class="item">
-      <div class="item-inner">
-        <div class="card">
-          <img class="card-img" :src="getPublicImageUrl(item?.image || '')" alt="item image">
-        </div>
-        <div>
-          <h2 class="title">{{ item?.title }}</h2>
-          <p class="desc">{{ item?.desc }}</p>
-          <p class="price">Цена: <span>{{ getPrice }} ₽</span></p>
-          <div v-if="item?.type === 'coffee'">
-            <p class="topping">Молоко:</p>
-            <div class="list">
-              <template v-for="option in item.milk" :key="option.value">
-                <label><input type="radio" :id="option.value" :value="option.value" v-model="selectedMilk" />
-                  {{ option.label }}</label>
-              </template>
-            </div>
-            <p class="topping">Добавки:</p>
-            <div class="list">
-              <template v-for="option in item.toppings" :key="option.value">
-                <label><input type="radio" :id="option.value" :value="option.value" v-model="selectedTopping" />
-                  {{ option.label }}</label>
-              </template>
-            </div>
+  <UiLoader :is-loading="loading">
+    <div class="container">
+      <div class="item">
+        <div class="item-inner">
+          <div class="card">
+            <img class="card-img" :src="getPublicImageUrl(item?.image || '')" alt="item image">
           </div>
-          <button @click="handleClick" class="button" type="button">В корзину</button>
+          <div>
+            <h2 class="title">{{ item?.title }}</h2>
+            <p class="desc">{{ item?.desc }}</p>
+            <p class="price">Цена: <span>{{ getPrice }} ₽</span></p>
+            <div v-if="item?.type === 'coffee'">
+              <p class="topping">Молоко:</p>
+              <div class="list">
+                <template v-for="option in item.milk" :key="option.value">
+                  <label><input type="radio" :id="option.value" :value="option.value" v-model="selectedMilk" />
+                    {{ option.label }} ({{ option.price }} ₽)</label>
+                </template>
+              </div>
+              <p class="topping">Добавки:</p>
+              <div class="list">
+                <template v-for="option in item.toppings" :key="option.value">
+                  <label><input type="radio" :id="option.value" :value="option.value" v-model="selectedTopping" />
+                    {{ option.label }} ({{ option.price }} ₽)</label>
+                </template>
+              </div>
+            </div>
+            <button @click="handleClick" class="button" type="button">В корзину</button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </UiLoader>
 </template>
 
 <style scoped>
