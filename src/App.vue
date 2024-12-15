@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { onMounted } from 'vue';
-  import { Toaster } from 'vue-sonner';
+  import { toast, Toaster } from 'vue-sonner';
   import { RouterView, useRouter } from 'vue-router'
 
   import UiHeader from './components/layout/UiHeader.vue';
@@ -14,12 +14,17 @@
     if (to.meta.requireAuth && !auth.isAuthenticated) {
       return {
         path: '/sign-in',
+        query: { redirect: to.path }
       }
     }
   })
 
   onMounted(async () => {
-    await auth.trySignIn();
+    const res = await auth.trySignIn();
+
+    if (!res) {
+      return toast.error('Возможно, вы не подтвердили почту.')
+    }
   })
 </script>
 
