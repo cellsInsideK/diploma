@@ -130,6 +130,7 @@
     width: 100%;
     aspect-ratio: 1;
     margin-block: auto;
+    object-fit: cover;
   }
 
   .title {
