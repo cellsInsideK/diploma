@@ -1,12 +1,13 @@
 <script setup lang="ts">
     import { ref } from 'vue';
-    import { RouterLink } from 'vue-router';
+    import { RouterLink, useRouter } from 'vue-router';
     import { toast } from 'vue-sonner';
 
     import { useAuthStore } from '@/stores/auth';
 
     const auth = useAuthStore();
     const isShown = ref(false);
+    const router = useRouter();
 
     const toggleBurgerMenu = () => {
         isShown.value = !isShown.value;
@@ -18,7 +19,8 @@
         if (!success)
             return toast.error('Что-то пошло не так')
 
-        return toast.success('Вы вышли из своего аккаунта')
+        toast.success('Вы вышли из своего аккаунта')
+        return router.push('/')
     }
 </script>
 

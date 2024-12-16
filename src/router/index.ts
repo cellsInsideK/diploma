@@ -9,7 +9,6 @@ import ProfilePage from '@/pages/ProfilePage.vue';
 import DeliveryPage from '@/pages/DeliveryPage.vue';
 import ItemPage from '@/pages/ItemPage.vue';
 
-//TODO 3)admin page
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

@@ -104,13 +104,16 @@
         <p class="date">От {{ new Date(delivery.date).toLocaleString('ru', {
           dateStyle: 'short', timeStyle: 'short'
         }) }}</p>
-        <p class="status">{{ statusMap.get(delivery.status) }}</p>
+        <p class="status">{{ statusMap.get(delivery.status) }} {{ delivery.status === 'cancelled' ?
+          `(${delivery.reason})` : '' }}</p>
       </div>
       <img @click="handleRepeat" class="repeat" src="/repeat.svg" alt="repeat delivery">
     </div>
     <p class="mobileDate"> От {{ new Date(delivery.date).toLocaleString('ru', {
       dateStyle: 'short', timeStyle: 'short'
     }) }}</p>
+    <p class="mobileReason">{{ statusMap.get(delivery.status) }} {{ delivery.status === 'cancelled' ?
+      `(${delivery.reason})` : '' }}</p>
     <div class="main">
       <template v-for="item in items" :key="item.localId">
         <div class="main-inner">
@@ -227,6 +230,12 @@
     margin-block: -20px;
   }
 
+  .mobileReason {
+    display: none;
+    font-weight: 700;
+    color: rgba(255, 234, 234, 0.5);
+  }
+
   .status {
     font-weight: 700;
   }
@@ -251,6 +260,10 @@
     }
 
     .mobileDate {
+      display: block;
+    }
+
+    .mobileReason {
       display: block;
     }
 

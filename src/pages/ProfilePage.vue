@@ -3,14 +3,16 @@
   import { toast } from 'vue-sonner';
 
   import UiDeliveryItem from '@/components/UiDeliveryItem.vue';
+  import UiLoader from '@/components/UiLoader.vue';
+  import UiAdminPanel from '@/components/UiAdminPanel.vue';
   import { supabase } from '@/lib/supabaseClient';
   import { useAuthStore } from '@/stores/auth';
   import type { DeliveryItem } from '@/stores/cartItem';
-  import UiLoader from '@/components/UiLoader.vue';
 
   const deliveries = ref<DeliveryItem[]>([]);
   const loading = ref(true);
   const sortType = ref<'asc' | 'desc'>('desc');
+  const user = ref();
 
   const auth = useAuthStore();
 
@@ -26,7 +28,9 @@
 
       return bDate.getTime() - aDate.getTime();
     })
-  })
+  });
+
+  const isAdmin = computed(() => user.value?.role === 'admin')
 
   onMounted(async () => {
     const { data, error } = await supabase.from('delivery').select().eq('userId', auth.user?.id);
@@ -35,8 +39,13 @@
       return toast.error('Произошла ошибка');
     }
 
-    loading.value = false;
     deliveries.value = data;
+
+    const { data: userData } = await supabase.from('users').select().eq('id', auth.user?.id);
+
+    user.value = userData![0];
+
+    loading.value = false;
   })
 
   const handleSort = () => {
@@ -47,7 +56,7 @@
 
 <template>
   <UiLoader :is-loading="loading">
-    <div class="container">
+    <div v-if="!isAdmin" class="container">
       <header class="header">
         <img :src="`https://ui-avatars.com/api/?name=${auth.username}&rounded=true&size=175`" class="avatar"
           alt="user avatar">
@@ -67,8 +76,8 @@
         <div v-else class="empty">Похоже, здесь пусто. 😢<br> Оформите доставку, чтобы увидеть свои заказы</div>
       </section>
     </div>
+    <UiAdminPanel v-else />
   </UiLoader>
-
 </template>
 
 <style scoped>

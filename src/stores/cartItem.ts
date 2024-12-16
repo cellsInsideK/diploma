@@ -25,6 +25,7 @@ export interface DeliveryItem {
   status: string;
   date: string;
   totalPrice: number;
+  reason: string;
 }
 
 export interface Topping {
