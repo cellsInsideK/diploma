@@ -130,13 +130,13 @@
   }
 
   .hero__title {
-    font-size: 20px;
+    font-size: 32px;
     font-weight: bold;
     margin-bottom: 15px;
   }
 
   .hero__description {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     margin-bottom: 20px;
   }
@@ -144,10 +144,10 @@
   .hero__button {
     background-color: rgb(226, 217, 200);
     border-radius: 6px;
-    padding: 2px 10px;
+    padding: 8px 24px;
     color: rgb(48, 38, 28);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 22px;
     font-weight: bold;
   }
 
@@ -310,7 +310,6 @@
       padding-block: 56px;
       padding-left: 0;
       text-align: center;
-
     }
 
     .hero__title {
@@ -318,6 +317,10 @@
     }
 
     .hero__description {
+      font-size: 18px;
+    }
+
+    .hero__button {
       font-size: 18px;
     }
 

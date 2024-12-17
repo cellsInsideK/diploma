@@ -364,11 +364,20 @@
     padding-inline: 20px;
     display: inline-flex;
     align-items: center;
+    color: rgb(200, 160, 119);
     background-color: transparent;
     border: 1px rgb(200, 160, 119) solid;
     border-radius: 10px;
-    color: rgb(48, 38, 28);
-    font-size: 16px;
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .input::placeholder {
+    color: rgb(200, 160, 119);
+  }
+
+  .input:focus {
+    outline: none;
   }
 
   .modal {
@@ -426,7 +435,7 @@
     border: none;
     border-radius: 10px;
     padding-block: 10px;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
     margin-top: 20px;
