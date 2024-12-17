@@ -410,7 +410,6 @@
   }
 
   .deleteButton {
-    padding-bottom: 80px;
     cursor: pointer;
     display: flex;
     align-items: center;
