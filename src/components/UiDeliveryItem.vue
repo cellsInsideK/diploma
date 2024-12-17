@@ -3,7 +3,7 @@
   import { toast } from 'vue-sonner';
   import { getPublicImageUrl } from '@/lib/getPublicImageUrl';
   import { supabase } from '@/lib/supabaseClient';
-  import type { DeliveryItem, LocalCartItem } from '@/stores/cartItem';
+  import { statusMap, type DeliveryItem, type LocalCartItem } from '@/stores/cartItem';
   import { useCartStore } from '@/stores/cart';
   import router from '@/router';
 
@@ -13,12 +13,6 @@
   }>()
 
   const cart = useCartStore();
-
-  const statusMap = new Map([
-    ['process', 'В процессе'],
-    ['cancelled', 'Отменен'],
-    ['finished', 'Завершен']
-  ])
 
   //@ts-expect-error typing error
   const items = ref<LocalCartItem[]>(delivery.items.map(i => JSON.parse(i)))

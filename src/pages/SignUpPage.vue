@@ -1,8 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
   import { toast } from 'vue-sonner';
 
+  import UiModal from '@/components/UiModal.vue';
   import { useAuthStore } from '@/stores/auth';
   import { validateEmail } from '@/lib/validateEmail';
 
@@ -11,8 +11,9 @@
   const password = ref('');
   const confirm = ref('');
 
+  const modalVisible = ref(false);
+
   const auth = useAuthStore();
-  const router = useRouter();
 
   const onSubmit = async () => {
     if (email.value === '' || login.value === '' || password.value === '' || confirm.value === '')
@@ -32,12 +33,21 @@
     if (!success)
       return toast.error('Что-то пошло не так. Попробуйте позже')
 
-    toast.success('На вашу почту пришло письмо для подтверждения email. Перейдите по ссылке внутри письма.');
-    return router.push('/');
+    return modalVisible.value = true;
   }
 </script>
 
 <template>
+  <UiModal v-model="modalVisible">
+    <div class="modal">
+      <h2 class="title">Подтверждение учетной записи</h2>
+      <p class="text">На адрес: <span>{{ email }}</span> была отправлена ссылка перейдите по ней
+        для того
+        чтобы подтвердить
+        регистрацию учетной записи </p>
+      <button class="submit">Закрыть</button>
+    </div>
+  </UiModal>
   <div class="container">
     <div class="inner">
       <form>
@@ -114,5 +124,24 @@
     font-weight: bold;
     cursor: pointer;
     margin-top: 15px;
+  }
+
+  .modal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .title {
+    font-weight: 700;
+    font-size: 24px;
+  }
+
+  .text {
+    text-align: justify;
+  }
+
+  .text>span {
+    font-weight: 700;
   }
 </style>

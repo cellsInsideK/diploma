@@ -218,15 +218,17 @@ export const useAdminStore = defineStore('admin', () => {
     return true;
   }
 
-  async function createMenu(menu: Menu, image?: Ref<File | null>) {
-    if (image?.value) {
-      const { error } = await supabase.storage
-        .from('images')
-        .upload(image.value.name, image.value, { upsert: true });
+  async function createMenu(menu: Menu, image: Ref<File | null>) {
+    if (!image.value) {
+      return false;
+    }
 
-      if (error) {
-        return false;
-      }
+    const { error: imageError } = await supabase.storage
+      .from('images')
+      .upload(image.value.name, image.value, { upsert: true });
+
+    if (imageError) {
+      return false;
     }
 
     const milk = [

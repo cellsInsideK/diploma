@@ -33,3 +33,11 @@ export interface Topping {
   value: string;
   price: number;
 }
+
+export const statusMap = new Map([
+  ['process', 'В обработке'],
+  ['finished', 'Подтвержден'],
+  ['delivering', 'Доставляется'],
+  ['completed', 'Завершен'],
+  ['cancelled', 'Отменен'],
+]);

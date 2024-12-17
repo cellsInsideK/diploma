@@ -5,21 +5,48 @@
   import Column from 'primevue/column';
   import { InputText } from 'primevue';
   import { toast } from 'vue-sonner';
+  import { statusMap } from '@/stores/cartItem';
+  import UiModal from './UiModal.vue';
 
   const adminStore = useAdminStore();
 
   const usersEditingRows = ref();
   const editedUser = ref<User | null>();
 
-  const bookingEditingRows = ref();
-  const editedBooking = ref();
-
   const deliveriesEditingRows = ref();
   const editedDelivery = ref();
+  const reason = ref();
+  const reasonModal = ref(false);
 
   const menuEditingRows = ref();
   const editedMenu = ref();
+  const menuModal = ref(false);
+  const modalTitle = ref('');
+  const modalPrice = ref('');
+  const modalType = ref('');
+  const modalDesc = ref('');
   const image = ref<File | null>(null);
+
+  const handleReason = () => {
+    reasonModal.value = true;
+  }
+
+  const handleReasonModal = () => {
+    reasonModal.value = false;
+  }
+
+  const handleCreateMenu = async () => {
+    const obj = { id: '', title: modalTitle.value, price: +modalPrice.value, type: modalType.value, desc: modalDesc.value, image: image.value!.name };
+
+    const res = await adminStore.createMenu(obj, image);
+
+    if (!res) {
+      return toast.error('Что-то пошло не так')
+    }
+
+    menuModal.value = false;
+    return toast.success('Позиция создана');
+  }
 
   //@ts-expect-error asd
   const getReadableDelivery = (json) => {
@@ -65,6 +92,7 @@
   const onDeliveriesRowEditSave = async (event) => {
     const { newData } = event;
     editedDelivery.value = newData;
+    editedDelivery.value.reason = reason.value;
 
     const res = await adminStore.updateDelivery(editedDelivery.value as Delivery);
     editedDelivery.value = null;
@@ -83,16 +111,6 @@
 
     if (image.value) {
       editedMenu.value.image = image.value.name
-    }
-
-    if (editedMenu.value.id === '') {
-      const res = await adminStore.createMenu(editedMenu.value);
-
-      if (!res) {
-        return toast.error('Что-то пошло не так')
-      }
-
-      return toast.success('Позиция создана');
     }
 
     const res = await adminStore.updateMenu(editedMenu.value as Menu, image);
@@ -130,31 +148,6 @@
     return toast.success('Пользователь обновлен');
   };
 
-  //@ts-expect-error asd
-  const onBookingRowEditSave = async (event) => {
-    const { newData } = event;
-    editedBooking.value = newData;
-
-    if (editedBooking.value.id === '') {
-      const res = await adminStore.createBooking(editedBooking.value);
-
-      if (!res) {
-        return toast.error('Что-то пошло не так')
-      }
-
-      return toast.success('Бронь создана');
-    }
-
-    const res = await adminStore.updateBooking(editedBooking.value);
-    editedBooking.value = null;
-
-    if (!res) {
-      return toast.error('Что-то пошло не так')
-    }
-
-    return toast.success('Бронь обновлена');
-  };
-
   const handleDeleteBooking = async (booking: Booking) => {
     const res = await adminStore.deleteBooking(booking)
 
@@ -163,12 +156,6 @@
     }
 
     return toast.success('Бронь удалена');
-  }
-
-  const handleAddBooking = () => {
-    adminStore.bookings.push({ id: '', name: '', tel: '', description: '' })
-
-    return toast.success('Для создания брони измените появившееся поле и сохраните.')
   }
 
   const handleDeleteMenu = async (menu: Menu) => {
@@ -181,10 +168,8 @@
     return toast.success('Позиция удалена');
   }
 
-  const handleAddMenu = () => {
-    adminStore.menu.push({ id: '', title: '', price: '', type: 'coffee', image: '', desc: '' })
-
-    return toast.success('Для создания позиции измените появившееся поле и сохраните.')
+  const handleMenuModal = () => {
+    return menuModal.value = true;
   }
 
   const handleImage = (event: Event) => {
@@ -193,6 +178,35 @@
 </script>
 
 <template>
+  <UiModal v-model="reasonModal">
+    <div class="modal">
+      <h2 class="title">Причина отмены заказа</h2>
+      <p>Укажите причину отказа:</p>
+      <textarea v-model="reason" class="textarea"></textarea>
+      <button @click="handleReasonModal" class="submit" type="button">Подтвердить</button>
+    </div>
+  </UiModal>
+  <UiModal v-model="menuModal">
+    <div class="modal">
+      <h2 class="title">Создание позиции</h2>
+      <p>Название:</p>
+      <input v-model="modalTitle" type="text" class="input" placeholder="Введите название">
+      <p>Стоимость:</p>
+      <input v-model="modalPrice" type="text" class="input" placeholder="Введите цену">
+      <p>Выберите тип:</p>
+      <select v-model="modalType">
+        <option value="coffee">Кофе</option>
+        <option value="drinks">Напиток</option>
+        <option value="bakery">Выпечка</option>
+        <option value="desserts">Десерт</option>
+      </select>
+      <p>Изображение:</p>
+      <input @change="handleImage" type="file" accept="image/*">
+      <p>Описание:</p>
+      <textarea v-model="modalDesc" class="textarea"></textarea>
+      <button @click="handleCreateMenu" type="button" class="submit">Добавить позицию</button>
+    </div>
+  </UiModal>
   <div class="container">
     <section class="admin">
       <h2 class="title">Админ панель</h2>
@@ -209,10 +223,15 @@
               <InputText style="border: 1px rgb(200, 160, 119) solid;
     border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
             </template></Column>
-          <Column style="padding: 10px;" field="role" header="Роль"><template #editor="{ data, field }">
-              <InputText style="border: 1px rgb(200, 160, 119) solid;
-    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
-            </template></Column>
+          <Column style="padding: 10px;" field="role" header="Роль">
+            <template #body="{ data, field }">{{ data[field] === '' ? 'Пользователь' : 'Администратор' }}</template>
+            <template #editor="{ data, field }">
+              <select v-model="data[field]">
+                <option value="">Пользователь</option>
+                <option value="admin">Администратор</option>
+              </select>
+            </template>
+          </Column>
           <Column :rowEditor="true" header="Редактирование" style="width: 10%; min-width: 8rem"
             bodyStyle="text-align:center">
           </Column>
@@ -220,24 +239,11 @@
       </div>
       <h3 class="subtitle">Брони столиков</h3>
       <div class="list">
-        <DataTable v-model:editingRows="bookingEditingRows" data-key="id" edit-mode="row" :value="adminStore.bookings"
-          style=" padding: 15px; border-radius: 20px;" @row-edit-save="onBookingRowEditSave">
+        <DataTable data-key="id" :value="adminStore.bookings" style=" padding: 15px; border-radius: 20px;">
           <Column style="padding-block: 10px; width: min-content;" field="id" header="id"></Column>
-          <Column style="padding: 10px;" field="name" header="Имя"><template #editor="{ data, field }">
-              <InputText style="border: 1px rgb(200, 160, 119) solid;
-    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
-            </template></Column>
-          <Column style="padding: 10px;" field="tel" header="Телефон"><template #editor="{ data, field }">
-              <InputText style="border: 1px rgb(200, 160, 119) solid;
-    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
-            </template></Column>
-          <Column style="padding: 10px;" field="description" header="Примечание"><template #editor="{ data, field }">
-              <InputText style="border: 1px rgb(200, 160, 119) solid;
-    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
-            </template></Column>
-          <Column :rowEditor="true" header="Редактирование" style="width: 10%; min-width: 8rem"
-            bodyStyle="text-align:center">
-          </Column>
+          <Column style="padding: 10px;" field="name" header="Имя"></Column>
+          <Column style="padding: 10px;" field="tel" header="Телефон"></Column>
+          <Column style="padding: 10px;" field="description" header="Примечание"></Column>
           <Column bodyStyle="text-align:center" style="padding: 10px;" header="Удаление">
             <template #body="{ index }">
               <button @click="handleDeleteBooking(adminStore.bookings[index])" class="deleteButton">
@@ -246,7 +252,6 @@
             </template>
           </Column>
         </DataTable>
-        <button class="submit" @click="handleAddBooking">Создать бронь</button>
       </div>
       <h3 class="subtitle">Доставки</h3>
       <div class="list">
@@ -261,18 +266,17 @@
           <Column style="padding: 10px;" field="address" header="Адрес"></Column>
           <Column style="padding: 10px;" field="comment" header="Комментарий"></Column>
           <Column style="padding: 10px;" field="status" header="Статус">
+            <template #body="{ data, field }">{{ statusMap.get(data[field]) }}</template>
             <template #editor="{ data, field }">
               <select v-model="data[field]">
-                <option value="process">process</option>
-                <option value="finished">finished</option>
-                <option value="cancelled">cancelled</option>
+                <option v-for="status in statusMap" :value="status[0]" :key="status[0]">{{ status[1] }}</option>
               </select>
             </template>
           </Column>
           <Column style="padding: 10px;" field="reason" header="Причина отказа">
-            <template #editor="{ data, field }">
-              <InputText style="border: 1px rgb(200, 160, 119) solid;
-    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid />
+            <template #editor="{ data }">
+              <button v-if="data.status === 'cancelled'" class="submit" @click="handleReason">Указать
+                причину</button>
             </template>
           </Column>
           <Column style="padding: 10px;" field="date" header="Дата и время">
@@ -326,7 +330,7 @@
           </Column>
           <Column style="padding: 10px;" field="image" header="Изображение">
             <template #editor>
-              <input type="file" @change="handleImage">
+              <input type="file" accept="image/*" @change="handleImage">
             </template>
           </Column>
           <Column style="padding: 10px;" field="desc" header="Описание">
@@ -346,13 +350,46 @@
             </template>
           </Column>
         </DataTable>
-        <button class="submit" @click="handleAddMenu">Создать позицию</button>
+        <button class="submit" @click="handleMenuModal">Создать позицию</button>
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
+  .input {
+    max-height: 50px;
+    width: 100%;
+    padding-block: 16px;
+    padding-inline: 20px;
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px rgb(200, 160, 119) solid;
+    border-radius: 10px;
+    color: rgb(48, 38, 28);
+    font-size: 16px;
+  }
+
+  .modal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .textarea {
+    resize: none;
+    min-height: 150px;
+    width: 100%;
+    padding-block: 16px;
+    padding-inline: 20px;
+    background-color: transparent;
+    border: 1px rgb(200, 160, 119) solid;
+    border-radius: 10px;
+    color: rgb(48, 38, 28);
+    font-size: 16px;
+  }
+
   .admin {
     margin-block: 20px;
   }
