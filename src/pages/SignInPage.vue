@@ -25,7 +25,7 @@
     const success = await auth.signIn(email.value, password.value);
 
     if (!success)
-      return toast.error('Возможно, вы не подтвердили почту')
+      return toast.error('Возможно, вы не подтвердили почту, либо ввели неправильные данные')
 
     toast.success('Вход завершен');
     return router.push('/');
