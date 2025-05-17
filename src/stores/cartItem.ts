@@ -5,6 +5,7 @@ export interface CartItem {
   type: string;
   image: string;
   desc: string;
+  amount: number;
   milk: Topping[] | null;
   toppings: Topping[] | null;
 }

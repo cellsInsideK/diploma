@@ -25,6 +25,7 @@
   const modalPrice = ref('');
   const modalType = ref('');
   const modalDesc = ref('');
+  const modalAmount = ref(20);
   const image = ref<File | null>(null);
 
   const handleReason = () => {
@@ -36,7 +37,7 @@
   }
 
   const handleCreateMenu = async () => {
-    const obj = { id: '', title: modalTitle.value, price: +modalPrice.value, type: modalType.value, desc: modalDesc.value, image: image.value!.name };
+    const obj = { id: '', title: modalTitle.value, price: +modalPrice.value, type: modalType.value, desc: modalDesc.value, amount: modalAmount.value, image: image.value!.name };
 
     const res = await adminStore.createMenu(obj, image);
 
@@ -50,42 +51,28 @@
 
   //@ts-expect-error asd
   const getReadableDelivery = (json) => {
-    const jsonRef = ref(json);
-    const obj = jsonRef.value.map((i: string) => JSON.parse(i));
+    //@ts-expect-error asd
+    const parsedItems = json.map(item => JSON.parse(item));
 
-    const titles: unknown[] = [];
-    const title: unknown[] = [];
+    const nonCoffeeItems: string[] = [];
+    const coffeeItems: string[] = [];
 
-    //@ts-expect-error ass
-    obj.map(item => {
+    //@ts-expect-error asd
+    parsedItems.forEach(item => {
       if (item.type !== 'coffee') {
-        return title.push(item.quantity, item.title);
+        nonCoffeeItems.push(`${item.quantity}x${item.title}`);
+      } else {
+        //@ts-expect-error asd
+        const milk = item.milk?.find(m => m.value === item.selectedMilk)?.label || 'без молока';
+        //@ts-expect-error asd
+        const topping = item.toppings?.find(t => t.value === item.selectedTopping)?.label || 'без топпинга';
+
+        coffeeItems.push(`${item.quantity}x${item.title} (${milk}, ${topping})`);
       }
+    });
 
-      //@ts-expect-error asd
-      const milk = item.milk?.reduce((acc, curr) => {
-        if (curr.value === item.selectedMilk) {
-          return acc = curr.label
-        }
-        return acc;
-      }, '')
-
-      //@ts-expect-error asd
-      const topping = item.toppings?.reduce((acc, curr) => {
-        if (curr.value === item.selectedTopping) {
-          return acc = curr.label
-        }
-        return acc;
-      }, '')
-
-      titles.push(item.quantity, item.title, milk, topping);
-    })
-
-    const coffeeTitle = titles.length > 0 ? `${titles[0]}x${titles[1]} (${titles[2]}, ${titles[3]}) ` : '';
-
-    const res = `${title.join('x')}` + `${coffeeTitle.length > 0 ? ', ' : ''}` + coffeeTitle;
-
-    return res;
+    // Объединяем все элементы
+    return [...nonCoffeeItems, ...coffeeItems].join(', ');
   }
 
   //@ts-expect-error asd
@@ -200,6 +187,8 @@
         <option value="bakery">Выпечка</option>
         <option value="desserts">Десерт</option>
       </select>
+      <p>Количество:</p>
+      <input v-model.number="modalAmount" type="number" min="1" class="input" placeholder="Введите количество">
       <p>Изображение:</p>
       <input @change="handleImage" type="file" accept="image/*">
       <p>Описание:</p>
@@ -326,6 +315,12 @@
                 <option value="bakery">Выпечка</option>
                 <option value="desserts">Десерт</option>
               </select>
+            </template>
+          </Column>
+          <Column style="padding: 10px;" field="amount" header="Количество">
+            <template #editor="{ data, field }">
+              <InputText style="border: 1px rgb(200, 160, 119) solid;
+    border-radius: 10px; padding: 10px;" v-model="data[field]" fluid type="number" />
             </template>
           </Column>
           <Column style="padding: 10px;" field="image" header="Изображение">

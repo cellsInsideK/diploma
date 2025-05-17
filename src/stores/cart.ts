@@ -113,6 +113,18 @@ export const useCartStore = defineStore('cart', () => {
 
     const itemsJSON = items.value.map((item) => JSON.stringify(item));
 
+    items.value.forEach(async (item) => {
+      const { error } = await supabase.rpc('decrease_product_amount', {
+        menu_id: item.id,
+        decrease_amount: item.quantity,
+      });
+
+      if (error) {
+        console.log(error);
+        return false;
+      }
+    });
+
     const { error } = await supabase.from('delivery').insert({
       tel,
       address,

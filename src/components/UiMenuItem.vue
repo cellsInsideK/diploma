@@ -13,6 +13,10 @@
   const cart = useCartStore();
 
   const handleAddToCart = () => {
+    if (item.amount === 0) {
+      return toast.error('Товар закончился!')
+    }
+
     if (!cart.addToCart(item)) {
       return toast.error('Необходимо зарегистрироваться чтобы совершать покупки');
     }

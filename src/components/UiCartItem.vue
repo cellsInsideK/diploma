@@ -18,7 +18,15 @@
   const toppingTypeList = item.toppings;
 
   const handleClick = (action: '+' | '-') => {
-    if (action === '+') return counter.value++
+    if (action === '+') {
+      if (item.amount > counter.value) {
+        return counter.value++
+      }
+
+      if (item.amount === counter.value) {
+        return
+      }
+    }
 
     if (counter.value === 1) return
 

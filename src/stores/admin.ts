@@ -36,6 +36,7 @@ export interface Menu {
   type: string;
   image: string;
   desc: string;
+  amount: number;
 }
 
 export const useAdminStore = defineStore('admin', () => {
@@ -118,7 +119,28 @@ export const useAdminStore = defineStore('admin', () => {
     return true;
   }
 
+  //TODO change amount
   async function updateDelivery(delivery: Delivery) {
+    console.log(delivery);
+    //@ts-expect-error asdw
+    const obj = delivery.items.map((i: string) => JSON.parse(i));
+    const { data } = await supabase.from('delivery').select().eq('id', delivery.id);
+
+    if (data![0].status === 'process' && delivery.status === 'cancelled') {
+      //@ts-expect-error asd
+      obj.forEach(async (item) => {
+        const { error } = await supabase.rpc('increase_product_amount', {
+          menu_id: item.id,
+          increase_amount: item.quantity,
+        });
+
+        if (error) {
+          console.log(error);
+          return false;
+        }
+      });
+    }
+
     const { error } = await supabase
       .from('delivery')
       .update({ status: delivery.status, reason: delivery.reason })
@@ -152,6 +174,7 @@ export const useAdminStore = defineStore('admin', () => {
         type: menu.type,
         image: menu.image,
         desc: menu.desc,
+        amount: menu.amount,
       })
       .eq('id', menu.id);
 
@@ -178,6 +201,7 @@ export const useAdminStore = defineStore('admin', () => {
     return true;
   }
 
+  // TODO check status
   async function deleteDelivery(delivery: Delivery) {
     const { error } = await supabase.from('delivery').delete().eq('id', delivery.id);
 
@@ -248,6 +272,7 @@ export const useAdminStore = defineStore('admin', () => {
       type: menu.type,
       image: menu.image,
       desc: menu.desc,
+      amount: menu.amount,
       milk,
       toppings,
     });
