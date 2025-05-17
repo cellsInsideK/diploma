@@ -257,9 +257,14 @@
           <Column style="padding: 10px;" field="status" header="Статус">
             <template #body="{ data, field }">{{ statusMap.get(data[field]) }}</template>
             <template #editor="{ data, field }">
-              <select v-model="data[field]">
-                <option v-for="status in statusMap" :value="status[0]" :key="status[0]">{{ status[1] }}</option>
-              </select>
+              <template v-if="data[field] !== 'cancelled'">
+                <select v-model="data[field]">
+                  <option value="finished">Подтвержден</option>
+                  <option value="delivering">Доставляется</option>
+                  <option value="completed">Завершен</option>
+                  <option value="cancelled">Отменен</option>
+                </select>
+              </template>
             </template>
           </Column>
           <Column style="padding: 10px;" field="reason" header="Причина отказа">
