@@ -14,7 +14,7 @@
     }
 
     const signOut = async () => {
-        const success = auth.signOut();
+        const success = await auth.signOut();
 
         if (!success)
             return toast.error('Что-то пошло не так')
