@@ -15,12 +15,9 @@
   const cart = useCartStore();
   const reason = computed(() => {
     if (delivery.status === 'cancelled') {
-      if (delivery.reason) {
-        return `(${delivery.reason})`
-      }
+      return delivery.reason ? `(${delivery.reason})` : '(причина не указана)'
     }
-
-    return '';
+    return ''
   })
 
   //@ts-expect-error typing error
@@ -107,8 +104,7 @@
         <p class="date">От {{ new Date(delivery.date).toLocaleString('ru', {
           dateStyle: 'short', timeStyle: 'short'
         }) }}</p>
-        <p class="status">{{ statusMap.get(delivery.status) }} {{ delivery.status === 'cancelled' ?
-          `(${delivery.reason})` : '' }}</p>
+        <p class="status">{{ statusMap.get(delivery.status) }} {{ reason }}</p>
       </div>
       <img @click="handleRepeat" class="repeat" src="/repeat.svg" alt="repeat delivery">
     </div>
