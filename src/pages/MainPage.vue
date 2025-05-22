@@ -240,6 +240,7 @@
   }
 
   .booking__textarea {
+    font-family: 'Gilroy';
     resize: none;
     min-height: 150px;
     min-width: 450px;

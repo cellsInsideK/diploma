@@ -259,6 +259,7 @@ export const useAdminStore = defineStore('admin', () => {
       { label: 'Обычное', price: 0, value: 'default' },
       { label: 'Кокосовое', price: 25, value: 'coconut' },
       { label: 'Овсяное', price: 25, value: 'oat' },
+      { label: 'Без молока', price: 0, value: 'no' },
     ];
     const toppings = [
       { label: 'Без добавок', price: 0, value: 'default' },

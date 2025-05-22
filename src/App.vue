@@ -67,6 +67,16 @@
     flex: 1;
   }
 
+  input {
+    box-shadow: none;
+    outline: none;
+  }
+
+  textarea {
+    box-shadow: none;
+    outline: none;
+  }
+
   @media (max-width: 700px) {
     .container {
       margin-inline: 20px;

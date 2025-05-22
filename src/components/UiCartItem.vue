@@ -97,8 +97,7 @@
 
   .card {
     background-color: white;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
+    border-radius: 16px;
     font-weight: bold;
     max-width: 200px;
     padding: 25px;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import { toast } from 'vue-sonner';
   import { getPublicImageUrl } from '@/lib/getPublicImageUrl';
   import { supabase } from '@/lib/supabaseClient';
@@ -13,6 +13,15 @@
   }>()
 
   const cart = useCartStore();
+  const reason = computed(() => {
+    if (delivery.status === 'cancelled') {
+      if (delivery.reason) {
+        return `(${delivery.reason})`
+      }
+    }
+
+    return '';
+  })
 
   //@ts-expect-error typing error
   const items = ref<LocalCartItem[]>(delivery.items.map(i => JSON.parse(i)))
@@ -106,8 +115,7 @@
     <p class="mobileDate"> От {{ new Date(delivery.date).toLocaleString('ru', {
       dateStyle: 'short', timeStyle: 'short'
     }) }}</p>
-    <p class="mobileReason">{{ statusMap.get(delivery.status) }} {{ delivery.status === 'cancelled' ?
-      `(${delivery.reason})` : '' }}</p>
+    <p class="mobileReason">{{ statusMap.get(delivery.status) }} {{ reason }}</p>
     <div class="main">
       <template v-for="item in items" :key="item.localId">
         <div class="main-inner">

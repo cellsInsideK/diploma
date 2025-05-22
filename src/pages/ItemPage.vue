@@ -114,8 +114,7 @@
   .card {
     height: fit-content;
     background-color: white;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
+    border-radius: 16px;
     font-weight: bold;
     width: 300px;
     aspect-ratio: 1;

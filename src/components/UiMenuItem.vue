@@ -39,8 +39,7 @@
 <style scoped>
   .card {
     background-color: white;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
+    border-radius: 16px;
     display: flex;
     justify-content: space-between;
     flex-direction: column;

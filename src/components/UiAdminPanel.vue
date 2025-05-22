@@ -296,6 +296,7 @@
       </div>
 
       <h3 class="subtitle">Меню</h3>
+      <button class="submit" @click="handleMenuModal">Создать позицию</button>
       <div class="list">
         <DataTable v-model:editingRows="menuEditingRows" data-key="id" edit-mode="row" :value="adminStore.menu"
           style=" padding: 15px; border-radius: 20px;" @row-edit-save="onMenuRowEditSave">
@@ -350,7 +351,6 @@
             </template>
           </Column>
         </DataTable>
-        <button class="submit" @click="handleMenuModal">Создать позицию</button>
       </div>
     </section>
   </div>
@@ -387,6 +387,7 @@
   }
 
   .textarea {
+    font-family: 'Gilroy';
     resize: none;
     min-height: 150px;
     width: 100%;
